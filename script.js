@@ -21,7 +21,9 @@ const addTransactionIntoDOM = transaction => {
   const li = document.createElement('li')
   li.classList.add(CSSClass)
   li.innerHTML = `
-  ${transaction.name} <span>${operator} R$ ${amountWithOutOperator}</span><button class="delete-btn">x</button>
+  ${transaction.name} 
+  <span>${operator} R$ ${amountWithOutOperator}</span>
+  <button class="delete-btn">x</button>
   `
   transactionsUl.append(li)
 }
@@ -47,6 +49,7 @@ const updateBalenceValues = () => {
 }
 
 const init = () => {
+  transactionsUl.innerHTML = ''
   dummyTransactions.forEach(addTransactionIntoDOM)
   updateBalenceValues()
 }
@@ -66,6 +69,10 @@ form.addEventListener('submit', event => {
   const transaction = {
     id: generateID(),
     name: transactionName,
-    amount: transactionAmount
+    amount: Number(transactionAmount)
   }
+  dummyTransactions.push(transaction)
+  init()
+  inputTransactionName.value = ''
+  inputTransactionAmount.value = ''
 })
