@@ -68,7 +68,7 @@ localStorage.setItem('transactions', JSON.stringify(transactions))
 
 const generateID = () => Math.round(Math.random() * 1000)
 
-form.addEventListener('submit', event => {
+const handleFormSubmit = event => {
   event.preventDefault()
 
   const transactionName = inputTransactionName.value.trim()
@@ -89,4 +89,6 @@ form.addEventListener('submit', event => {
 
   inputTransactionName.value = ''
   inputTransactionAmount.value = ''
-})
+}
+
+form.addEventListener('submit',handleFormSubmit )
