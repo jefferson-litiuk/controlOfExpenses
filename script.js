@@ -9,11 +9,11 @@ const inputTransactionAmount = document.querySelector('#amount')
 const localStorageTransactions = JSON.parse(localStorage
   .getItem('transactions'))
 let transactions = localStorage
-.getItem('transactions') != null ? localStorageTransactions: []
+  .getItem('transactions') != null ? localStorageTransactions : []
 
 const removeTransaction = ID => {
   transactions = transactions
-  .filter(transaction => transaction.id != ID)
+    .filter(transaction => transaction.id != ID)
   updateLocalStorage()
   init()
 }
@@ -33,20 +33,22 @@ const addTransactionIntoDOM = transaction => {
   `
   transactionsUl.append(li)
 }
+const getExpenses = transactionsAmounts => Math.abs(transactionsAmounts
+  .filter(value => value < 0)
+  .reduce((accumulator, value) => accumulator + value, 0))
+  .toFixed(2)
+const getIncome = transactionsAmounts => transactionsAmounts.filter(value => value > 0)
+  .reduce((accumulator, value) => accumulator + value, 0)
+  .toFixed(2)
+const getTotal = transactionsAmounts => transactionsAmounts
+  .reduce((accumulator, transaction) => accumulator + transaction, 0)
+  .toFixed(2)
+
 const updateBalenceValues = () => {
-  const transactionsAmounts = transactions
-    .map(transaction => transaction.amount)
-  const total = transactionsAmounts
-    .reduce((accumulator, transaction) => accumulator + transaction, 0)
-    .toFixed(2)
-  const income = transactionsAmounts
-    .filter(value => value > 0)
-    .reduce((accumulator, value) => accumulator + value, 0)
-    .toFixed(2)
-  const expense = Math.abs(transactionsAmounts
-    .filter(value => value < 0)
-    .reduce((accumulator, value) => accumulator + value, 0)
-    .toFixed(2))
+  const transactionsAmounts = transactions.map(({ amount }) => amount)
+  const total = getTotal(transactionsAmounts)
+  const income = getIncome(transactionsAmounts)
+  const expense = getExpenses(transactionsAmounts)
 
   balanceDisplay.textContent = `R$ ${total}`
   incomeDisplay.textContent = `R$ ${income}`
@@ -62,33 +64,41 @@ const init = () => {
 init();
 
 //save in LocalStorage
-const updateLocalStorage = ()=>{
-localStorage.setItem('transactions', JSON.stringify(transactions))
+const updateLocalStorage = () => {
+  localStorage.setItem('transactions', JSON.stringify(transactions))
 }
 
 const generateID = () => Math.round(Math.random() * 1000)
+
+const addToTransactionsArray = (transactionName, transactionAmount) => {
+  transactions.push({
+    id: generateID(),
+    name: transactionName,
+    amount: Number(transactionAmount)
+  })
+
+}
+const cleanInputs = () => {
+  inputTransactionName.value = ''
+  inputTransactionAmount.value = ''
+}
 
 const handleFormSubmit = event => {
   event.preventDefault()
 
   const transactionName = inputTransactionName.value.trim()
   const transactionAmount = inputTransactionAmount.value.trim()
+  const isSomeInputEmpty = transactionName === '' || transactionAmount === ''
 
-  if (transactionName === '' || transactionAmount === '') {
+  if (isSomeInputEmpty) {
     alert('Por favor, preencha o campo nome e valor da transação!')
     return
   }
-  const transaction = {
-    id: generateID(),
-    name: transactionName,
-    amount: Number(transactionAmount)
-  }
-  transactions.push(transaction)
+
+  addToTransactionsArray(transactionName, transactionAmount)
   init()
   updateLocalStorage()
-
-  inputTransactionName.value = ''
-  inputTransactionAmount.value = ''
+  cleanInputs()
 }
 
-form.addEventListener('submit',handleFormSubmit )
+form.addEventListener('submit', handleFormSubmit)
